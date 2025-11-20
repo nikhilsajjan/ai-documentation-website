@@ -1,3 +1,9 @@
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+    <img src="docs/IMG_9687.webp" alt="Drum Loop Recorder" style="width: calc(33.333% - 0.67rem); min-width: 200px; border: 3px solid #000; flex: 1;">
+    <div style="width: calc(33.333% - 0.67rem); min-width: 200px; border: 3px solid #000; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999; flex: 1; aspect-ratio: 4/3;">Image 2</div>
+    <div style="width: calc(33.333% - 0.67rem); min-width: 200px; border: 3px solid #000; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999; flex: 1; aspect-ratio: 4/3;">Image 3</div>
+</div>
+
 # Drum Loop Recorder - Complete Project Documentation
 
 ## Project Overview
