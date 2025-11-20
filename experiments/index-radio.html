@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Experimentations - Radio Tuner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Courier New', monospace;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-box {
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 2px solid #333;
+            padding: 40px 60px;
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+        }
+
+        .floating-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: #333;
+            border-radius: 50%;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        body.dark-mode .floating-dot {
+            background-color: #e0e0e0;
+        }
+
+        body.dark-mode .content-box {
+            background-color: rgba(42, 42, 42, 0.3);
+            border-color: #555;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-weight: bold;
+            color: #333;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .description {
+            font-family: 'Courier New', monospace;
+            color: #666;
+            font-size: 1rem;
+            text-align: center;
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        .experiments-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            background-color: #fff;
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .subtitle {
+            font-family: 'Courier New', monospace;
+            color: #666;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        /* Radio Tuner Styles */
+        .radio-container {
+            max-width: 650px;
+            width: 100%;
+            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+            border: 8px solid #5C3317;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.6),
+                inset 0 2px 10px rgba(255, 255, 255, 0.1);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .radio-container::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        .radio-display {
+            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 4px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.9);
+        }
+
+        .station-info {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .station-name {
+            color: #FFD700;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.1rem;
+            text-shadow: 0 0 15px #FFD700;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .frequency-display {
+            color: #4CAF50;
+            font-family: 'Courier New', monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #4CAF50;
+            letter-spacing: 3px;
+        }
+
+        .signal-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .signal-bar {
+            width: 8px;
+            height: 20px;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 2px;
+            transition: background-color 0.3s ease;
+        }
+
+        .signal-bar.active {
+            background-color: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .signal-bar:nth-child(2) { height: 25px; }
+        .signal-bar:nth-child(3) { height: 30px; }
+        .signal-bar:nth-child(4) { height: 35px; }
+        .signal-bar:nth-child(5) { height: 40px; }
+
+        .tuner-dial-container {
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 4px solid #3a3a3a;
+            border-radius: 15px;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .frequency-scale {
+            position: relative;
+            height: 60px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg,
+                #8B0000 0%,
+                #FF4500 10%,
+                #FFD700 20%,
+                #32CD32 30%,
+                #1E90FF 40%,
+                #9370DB 50%,
+                #FF1493 60%,
+                #FF6347 70%,
+                #FFD700 80%,
+                #32CD32 90%,
+                #1E90FF 100%);
+            border: 2px solid #666;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .frequency-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
+        }
+
+        .frequency-marker {
+            width: 2px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .frequency-marker.station {
+            background-color: rgba(255, 255, 255, 0.8);
+            width: 3px;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .frequency-marker::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: #999;
+            white-space: nowrap;
+        }
+
+        .tuner-needle {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            width: 3px;
+            height: calc(100% + 30px);
+            background-color: #FF0000;
+            box-shadow: 0 0 10px #FF0000, 0 0 20px rgba(255, 0, 0, 0.5);
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 2;
+            transition: left 0.1s ease-out;
+        }
+
+        .tuner-needle::before {
+            content: '▼';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FF0000;
+            font-size: 1rem;
+            text-shadow: 0 0 5px #FF0000;
+        }
+
+        .dial-slider {
+            width: 100%;
+            height: 30px;
+            background: transparent;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .dial-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #FFD700 0%, #B8860B 100%);
+            border: 3px solid #8B7500;
+            border-radius: 50%;
+            cursor: grab;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .dial-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .dial-slider::-moz-range-thumb {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #FFD700 0%, #B8860B 100%);
+            border: 3px solid #8B7500;
+            border-radius: 50%;
+            cursor: grab;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .dial-slider::-moz-range-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .speaker-grille {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 8px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 4px solid #3a3a3a;
+            border-radius: 12px;
+            box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .speaker-hole {
+            aspect-ratio: 1;
+            background-color: #0a0a0a;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        .radio-label {
+            text-align: center;
+            margin-top: 20px;
+            font-family: 'Press Start 2P', cursive;
+            color: #FFD700;
+            font-size: 0.9rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 3px;
+        }
+
+        .content-display {
+            max-width: 800px;
+            width: 100%;
+            background-color: #f9f9f9;
+            border: 2px solid #333;
+            padding: 30px;
+            margin-top: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .content-display.active {
+            display: block;
+        }
+
+        .content-display h3 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .time-section {
+            margin-bottom: 2rem;
+        }
+
+        .time-section:last-child {
+            margin-bottom: 0;
+        }
+
+        details {
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+        }
+
+        details[open] {
+            background-color: #f5f5f5;
+        }
+
+        summary {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            padding: 8px;
+            user-select: none;
+        }
+
+        summary:hover {
+            background-color: #e0e0e0;
+            border-radius: 4px;
+        }
+
+        summary::marker {
+            content: '▶ ';
+        }
+
+        details[open] summary::marker {
+            content: '▼ ';
+        }
+
+        .time-content {
+            margin-top: 15px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #444;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            background-color: #fafafa;
+            border-left: 3px solid #333;
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .time-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .time-content::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .time-content::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .time-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        footer {
+            border-top: 3px solid #333;
+        }
+
+        .footer-content {
+            max-width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 3px 1fr;
+            align-items: stretch;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 40px;
+            justify-content: center;
+            position: relative;
+        }
+
+        .footer-links h4 {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links a {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            text-decoration: underline;
+            font-size: 0.95rem;
+            transition: color 0.3s ease, transform 0.2s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: #000;
+            transform: translateX(5px);
+        }
+
+        .footer-divider {
+            background-color: #333;
+            width: 3px;
+        }
+
+        .footer-name {
+            text-align: center;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .footer-name h3 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.184rem;
+            color: #333;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .dark-mode-toggle {
+            font-family: 'Courier New', monospace;
+            background-color: transparent;
+            color: #333;
+            border: 2px solid #333;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: normal;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: lowercase;
+            text-decoration: none !important;
+            display: inline-block;
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #333 !important;
+            color: #fff !important;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .hero-section {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode .footer-name h3 {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .description,
+        body.dark-mode .subtitle {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .experiments-section {
+            background-color: #252525;
+        }
+
+        body.dark-mode .content-display {
+            background-color: #2a2a2a;
+            border-color: #555;
+        }
+
+        body.dark-mode .content-display h3 {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .time-content {
+            background-color: #1f1f1f;
+            border-left-color: #555;
+            color: #b0b0b0;
+        }
+
+        body.dark-mode details {
+            border-color: #555;
+            background-color: #2a2a2a;
+        }
+
+        body.dark-mode details[open] {
+            background-color: #252525;
+        }
+
+        body.dark-mode summary {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode summary:hover {
+            background-color: #333;
+        }
+
+        body.dark-mode footer {
+            border-top-color: #555;
+        }
+
+        body.dark-mode .footer-divider {
+            background-color: #555;
+        }
+
+        body.dark-mode .footer-links a,
+        body.dark-mode .footer-links h4 {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .footer-links a:hover {
+            color: #fff;
+        }
+
+        body.dark-mode .back-to-top-btn,
+        body.dark-mode .dark-mode-toggle {
+            color: #e0e0e0;
+            border-color: #555;
+        }
+
+        body.dark-mode .back-to-top-btn:hover,
+        body.dark-mode .dark-mode-toggle:hover {
+            background-color: #555 !important;
+            color: #fff !important;
+        }
+
+        .footer-back-to-top {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+        }
+
+        .back-to-top-btn {
+            font-family: 'Courier New', monospace;
+            background-color: transparent;
+            color: #333;
+            border: 2px solid #333;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: normal;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+            display: inline-block;
+            text-transform: lowercase;
+        }
+
+        .back-to-top-btn:hover {
+            background-color: #333 !important;
+            color: #fff !important;
+        }
+
+        @media (max-width: 768px) {
+            .radio-container {
+                padding: 25px;
+            }
+
+            .frequency-scale {
+                height: 50px;
+            }
+
+            .speaker-grille {
+                grid-template-columns: repeat(10, 1fr);
+                gap: 6px;
+            }
+
+            .station-name {
+                font-size: 0.8rem;
+            }
+
+            .frequency-display {
+                font-size: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+
+            h2 {
+                font-size: 1rem;
+            }
+
+            .description, .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .content-display {
+                padding: 20px;
+            }
+
+            .content-display h3 {
+                font-size: 0.9rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 3px auto auto;
+            }
+
+            .footer-divider {
+                height: 3px;
+                width: 100%;
+            }
+
+            .footer-back-to-top {
+                position: static;
+                order: 3;
+                padding: 20px;
+                display: flex;
+                justify-content: center;
+            }
+
+            .footer-name {
+                order: 1;
+            }
+
+            .footer-divider {
+                order: 2;
+            }
+
+            .footer-links {
+                order: 3;
+                padding-bottom: 80px;
+            }
+
+            .footer-name h3 {
+                font-size: 1.1rem;
+            }
+
+            .dark-mode-toggle {
+                position: static;
+                margin-top: 20px;
+            }
+
+            .footer-links a:hover {
+                transform: translateX(0);
+            }
+
+            .content-box {
+                padding: 30px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero-section">
+        <div class="content-box">
+            <h1>AI experimentations</h1>
+            <p class="description">Hi, I'm Nikhil, currently enrolled in the Interaction Design Program at CIID. This website showcases my AI experimentations from this week's course: AI Experiments. Week 1 faculty: Durrel Bishop and Jonathan Topf.</p>
+        </div>
+    </section>
+
+    <section class="experiments-section">
+        <h2>The Experiment Archive</h2>
+        <p class="subtitle">Tune the radio dial to find experiment broadcasts</p>
+
+        <div class="radio-container">
+            <div class="radio-display">
+                <div class="station-info">
+                    <div class="station-name" id="stationName">AI-EXP RADIO</div>
+                    <div class="frequency-display" id="frequencyDisplay">---.-</div>
+                </div>
+                <div class="signal-indicator">
+                    <div class="signal-bar"></div>
+                    <div class="signal-bar"></div>
+                    <div class="signal-bar"></div>
+                    <div class="signal-bar"></div>
+                    <div class="signal-bar"></div>
+                </div>
+            </div>
+
+            <div class="tuner-dial-container">
+                <div class="frequency-scale">
+                    <div class="tuner-needle" id="tunerNeedle"></div>
+                    <div class="frequency-markers" id="frequencyMarkers"></div>
+                </div>
+                <input type="range" min="880" max="1080" value="980" class="dial-slider" id="dialSlider">
+            </div>
+
+            <div class="speaker-grille" id="speakerGrille"></div>
+
+            <div class="radio-label">EXPERIMENT RADIO</div>
+        </div>
+
+        <div id="content-display" class="content-display">
+            <h3 id="content-title"></h3>
+            <div id="content-sections"></div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-name">
+                <h3>nikhil<br>sajjan</h3>
+                <button class="dark-mode-toggle" id="darkModeToggle">dark mode</button>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-links">
+                <h4>Connect</h4>
+                <a href="https://your-website.com" target="_blank">Personal Website</a>
+                <a href="https://linkedin.com/in/your-profile" target="_blank">LinkedIn</a>
+                <a href="https://instagram.com/your-profile" target="_blank">Instagram</a>
+
+                <div class="footer-back-to-top">
+                    <a href="#" class="back-to-top-btn" id="backToTop">
+                        go to top
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const docsMapping = {
+            week1: {
+                monday: {},
+                tuesday: {
+                    afternoon: "docs/Tuesday-afternoon-week 1 .md"
+                },
+                wednesday: {
+                    morning: "docs/Wednesday-morning-week 1.md",
+                    afternoon: "docs/wednesday-afternoon-week 1 .md"
+                },
+                thursday: {},
+                friday: {}
+            },
+            week2: {
+                monday: {},
+                tuesday: {},
+                wednesday: {},
+                thursday: {},
+                friday: {}
+            }
+        };
+
+        // Station mappings (frequency -> week/day)
+        const stations = [
+            { freq: 900, week: 'week1', day: 'monday', name: 'W1-MON', hasContent: false },
+            { freq: 920, week: 'week1', day: 'tuesday', name: 'W1-TUE', hasContent: true },
+            { freq: 940, week: 'week1', day: 'wednesday', name: 'W1-WED', hasContent: true },
+            { freq: 960, week: 'week1', day: 'thursday', name: 'W1-THU', hasContent: false },
+            { freq: 980, week: 'week1', day: 'friday', name: 'W1-FRI', hasContent: false },
+            { freq: 1000, week: 'week2', day: 'monday', name: 'W2-MON', hasContent: false },
+            { freq: 1020, week: 'week2', day: 'tuesday', name: 'W2-TUE', hasContent: false },
+            { freq: 1040, week: 'week2', day: 'wednesday', name: 'W2-WED', hasContent: false },
+            { freq: 1060, week: 'week2', day: 'thursday', name: 'W2-THU', hasContent: false },
+            { freq: 1080, week: 'week2', day: 'friday', name: 'W2-FRI', hasContent: false }
+        ];
+
+        const contentDisplay = document.getElementById('content-display');
+        const contentTitle = document.getElementById('content-title');
+        const contentSections = document.getElementById('content-sections');
+        const dialSlider = document.getElementById('dialSlider');
+        const tunerNeedle = document.getElementById('tunerNeedle');
+        const frequencyDisplay = document.getElementById('frequencyDisplay');
+        const stationName = document.getElementById('stationName');
+        const signalBars = document.querySelectorAll('.signal-bar');
+        const frequencyMarkers = document.getElementById('frequencyMarkers');
+        const speakerGrille = document.getElementById('speakerGrille');
+
+        // Generate speaker holes
+        for (let i = 0; i < 75; i++) {
+            const hole = document.createElement('div');
+            hole.className = 'speaker-hole';
+            speakerGrille.appendChild(hole);
+        }
+
+        // Generate frequency markers
+        stations.forEach(station => {
+            const marker = document.createElement('div');
+            marker.className = 'frequency-marker' + (station.hasContent ? ' station' : '');
+            marker.dataset.label = station.freq;
+            const position = ((station.freq - 880) / 200) * 100;
+            marker.style.left = `${position}%`;
+            frequencyMarkers.appendChild(marker);
+        });
+
+        async function loadExternalContent(fileName) {
+            try {
+                const response = await fetch(fileName);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${fileName}`);
+                }
+                return await response.text();
+            } catch (error) {
+                console.error('Error loading content:', error);
+                return `Error loading content from ${fileName}.\nMake sure the file exists in the docs directory.`;
+            }
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function findNearestStation(freq) {
+            let nearest = null;
+            let minDistance = Infinity;
+
+            stations.forEach(station => {
+                const distance = Math.abs(station.freq - freq);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearest = station;
+                }
+            });
+
+            return { station: nearest, distance: minDistance };
+        }
+
+        function updateSignalStrength(distance) {
+            const maxDistance = 10;
+            const strength = Math.max(0, 1 - (distance / maxDistance));
+            const activeBars = Math.ceil(strength * 5);
+
+            signalBars.forEach((bar, index) => {
+                if (index < activeBars) {
+                    bar.classList.add('active');
+                } else {
+                    bar.classList.remove('active');
+                }
+            });
+
+            return strength > 0.7;
+        }
+
+        async function updateContent(week, day) {
+            const dayData = docsMapping[week][day];
+            const weekNum = week.replace('week', '');
+            contentTitle.textContent = `Week ${weekNum} - ${capitalizeFirst(day)}`;
+
+            contentSections.innerHTML = '';
+
+            const hasMorning = dayData.morning;
+            const hasAfternoon = dayData.afternoon;
+
+            if (!hasMorning && !hasAfternoon) {
+                contentSections.innerHTML = '<div class="experiment-content">No experiments documented for this day yet.</div>';
+                contentDisplay.classList.add('active');
+                return;
+            }
+
+            contentDisplay.classList.add('active');
+
+            if (hasMorning && hasAfternoon) {
+                const morningSection = document.createElement('div');
+                morningSection.className = 'time-section';
+                morningSection.innerHTML = `
+                    <details open>
+                        <summary>Morning</summary>
+                        <div class="time-content">Loading morning content...</div>
+                    </details>
+                `;
+                contentSections.appendChild(morningSection);
+
+                const afternoonSection = document.createElement('div');
+                afternoonSection.className = 'time-section';
+                afternoonSection.innerHTML = `
+                    <details>
+                        <summary>Afternoon</summary>
+                        <div class="time-content">Loading afternoon content...</div>
+                    </details>
+                `;
+                contentSections.appendChild(afternoonSection);
+
+                const morningContent = await loadExternalContent(hasMorning);
+                morningSection.querySelector('.time-content').textContent = morningContent;
+
+                const afternoonContent = await loadExternalContent(hasAfternoon);
+                afternoonSection.querySelector('.time-content').textContent = afternoonContent;
+
+            } else if (hasMorning) {
+                const section = document.createElement('div');
+                section.className = 'time-section';
+                section.innerHTML = `
+                    <details open>
+                        <summary>Morning</summary>
+                        <div class="time-content">Loading content...</div>
+                    </details>
+                `;
+                contentSections.appendChild(section);
+
+                const content = await loadExternalContent(hasMorning);
+                section.querySelector('.time-content').textContent = content;
+
+            } else if (hasAfternoon) {
+                const section = document.createElement('div');
+                section.className = 'time-section';
+                section.innerHTML = `
+                    <details open>
+                        <summary>Afternoon</summary>
+                        <div class="time-content">Loading content...</div>
+                    </details>
+                `;
+                contentSections.appendChild(section);
+
+                const content = await loadExternalContent(hasAfternoon);
+                section.querySelector('.time-content').textContent = content;
+            }
+        }
+
+        dialSlider.addEventListener('input', (e) => {
+            const freq = parseInt(e.target.value);
+            const needlePosition = ((freq - 880) / 200) * 100;
+            tunerNeedle.style.left = `${needlePosition}%`;
+
+            const { station, distance } = findNearestStation(freq);
+            const isTuned = updateSignalStrength(distance);
+
+            if (isTuned && station.hasContent) {
+                frequencyDisplay.textContent = `${station.freq}.0`;
+                stationName.textContent = station.name;
+                updateContent(station.week, station.day);
+            } else {
+                frequencyDisplay.textContent = `${freq}.${Math.floor(Math.random() * 10)}`;
+                stationName.textContent = isTuned ? station.name : '~ STATIC ~';
+                contentDisplay.classList.remove('active');
+            }
+        });
+
+        // Floating dots animation
+        const heroSection = document.querySelector('.hero-section');
+        const cols = 75;
+        const rows = 75;
+        const dots = [];
+
+        const spacingX = 100 / (cols - 1);
+        const spacingY = 100 / (rows - 1);
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const dot = document.createElement('div');
+                dot.className = 'floating-dot';
+
+                const x = col * spacingX;
+                const y = row * spacingY;
+
+                dot.style.left = `${x}%`;
+                dot.style.top = `${y}%`;
+
+                const normalizedX = col / (cols - 1);
+                const normalizedY = row / (rows - 1);
+
+                const topLeft = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY) / Math.sqrt(2);
+                const topRight = Math.sqrt((1 - normalizedX) * (1 - normalizedX) + normalizedY * normalizedY) / Math.sqrt(2);
+                const bottomLeft = Math.sqrt(normalizedX * normalizedX + (1 - normalizedY) * (1 - normalizedY)) / Math.sqrt(2);
+                const bottomRight = Math.sqrt((1 - normalizedX) * (1 - normalizedX) + (1 - normalizedY) * (1 - normalizedY)) / Math.sqrt(2);
+
+                const opacity = (
+                    (1 - topLeft) * 0.6 +
+                    (1 - topRight) * 0.4 +
+                    (1 - bottomLeft) * 0.35 +
+                    (1 - bottomRight) * 0.2
+                ) / 4;
+
+                dot.style.opacity = Math.max(0.1, opacity);
+
+                heroSection.appendChild(dot);
+                dots.push({
+                    element: dot,
+                    baseX: x,
+                    baseY: y,
+                    baseOpacity: Math.max(0.1, opacity)
+                });
+            }
+        }
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let prevMouseX = 0;
+        let prevMouseY = 0;
+        let mouseVelocityX = 0;
+        let mouseVelocityY = 0;
+        let smoothVelocityX = 0;
+        let smoothVelocityY = 0;
+        let aspectRatio = 1;
+        let time = 0;
+
+        function updateAspectRatio() {
+            const rect = heroSection.getBoundingClientRect();
+            aspectRatio = rect.width / rect.height;
+        }
+        updateAspectRatio();
+        window.addEventListener('resize', updateAspectRatio);
+
+        function updateDots() {
+            time += 0.02;
+
+            smoothVelocityX += (mouseVelocityX - smoothVelocityX) * 0.15;
+            smoothVelocityY += (mouseVelocityY - smoothVelocityY) * 0.15;
+
+            dots.forEach((dot) => {
+                const waveX = Math.sin(time + dot.baseX * 0.05 + dot.baseY * 0.03) * 12.6;
+                const waveY = Math.cos(time + dot.baseX * 0.03 + dot.baseY * 0.05) * 12.6;
+
+                const dx = (mouseX - dot.baseX) * aspectRatio;
+                const dy = mouseY - dot.baseY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                let finalOffsetX = waveX;
+                let finalOffsetY = waveY;
+                let scale = 1;
+
+                if (distance < 10) {
+                    const influence = (10 - distance) / 10;
+                    const smoothInfluence = influence * influence;
+
+                    const pointerX = smoothVelocityX * smoothInfluence * 0.4;
+                    const pointerY = smoothVelocityY * smoothInfluence * 0.4;
+
+                    if (!dot.targetX) {
+                        dot.targetX = 0;
+                        dot.targetY = 0;
+                    }
+
+                    dot.targetX += (pointerX * 10 - dot.targetX) * 0.2;
+                    dot.targetY += (pointerY * 10 - dot.targetY) * 0.2;
+
+                    finalOffsetX = waveX + dot.targetX;
+                    finalOffsetY = waveY + dot.targetY;
+
+                    scale = 1 + (1 - distance / 10) * 1.05;
+                } else if (dot.targetX && (Math.abs(dot.targetX) > 0.1 || Math.abs(dot.targetY) > 0.1)) {
+                    dot.targetX *= 0.9;
+                    dot.targetY *= 0.9;
+
+                    finalOffsetX = waveX + dot.targetX;
+                    finalOffsetY = waveY + dot.targetY;
+
+                    if (Math.abs(dot.targetX) < 0.1 && Math.abs(dot.targetY) < 0.1) {
+                        dot.targetX = 0;
+                        dot.targetY = 0;
+                    }
+                } else {
+                    if (distance < 10) {
+                        scale = 1 + (1 - distance / 10) * 1.05;
+                    }
+                }
+
+                dot.element.style.transform = `translate(${finalOffsetX}px, ${finalOffsetY}px) scale(${scale})`;
+            });
+
+            mouseVelocityX *= 0.92;
+            mouseVelocityY *= 0.92;
+
+            requestAnimationFrame(updateDots);
+        }
+
+        updateDots();
+
+        heroSection.addEventListener('mousemove', (e) => {
+            const rect = heroSection.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+            mouseX = (x / rect.width) * 100;
+            mouseY = (y / rect.height) * 100;
+
+            mouseVelocityX = mouseX - prevMouseX;
+            mouseVelocityY = mouseY - prevMouseY;
+        });
+
+        heroSection.addEventListener('mouseleave', () => {
+            mouseVelocityX = 0;
+            mouseVelocityY = 0;
+            smoothVelocityX = 0;
+            smoothVelocityY = 0;
+
+            dots.forEach(dot => {
+                if (dot.targetX) {
+                    dot.targetX = 0;
+                    dot.targetY = 0;
+                }
+            });
+        });
+
+        // Back to top functionality
+        document.getElementById('backToTop').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        const darkMode = localStorage.getItem('darkMode');
+        if (darkMode === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.textContent = 'light mode';
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                darkModeToggle.textContent = 'light mode';
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                darkModeToggle.textContent = 'dark mode';
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    </script>
+</body>
+</html>
