@@ -31,6 +31,7 @@
             padding: 20px;
             position: relative;
             overflow: hidden;
+            cursor: grab;
         }
 
         .content-box {
@@ -474,6 +475,38 @@
             background: #555;
         }
 
+        .full-day-content {
+            max-height: 800px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #444;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            background-color: #fafafa;
+            border-left: 3px solid #333;
+        }
+
+        .full-day-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .full-day-content::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .full-day-content::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .full-day-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -740,6 +773,12 @@
         }
 
         body.dark-mode .time-content {
+            background-color: #1f1f1f;
+            border-left-color: #555;
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .full-day-content {
             background-color: #1f1f1f;
             border-left-color: #555;
             color: #b0b0b0;
@@ -1211,9 +1250,12 @@
                 },
                 thursday: {
                     morning: "docs/Thursday-morning- week 1.md",
-                    afternoon: "docs/Thursday-afternoon-week 1.md"
+                    afternoon: "docs/Thursday-afternoon-week 1.md",
+                    updates: "docs/Updates-23Nov.md"
                 },
-                friday: {}
+                friday: {
+                    full: "docs/Friday-week 1.md"
+                }
             },
             week2: {
                 monday: {},
@@ -1281,8 +1323,10 @@
 
             const hasMorning = dayData.morning;
             const hasAfternoon = dayData.afternoon;
+            const hasFull = dayData.full;
+            const hasUpdates = dayData.updates;
 
-            if (!hasMorning && !hasAfternoon) {
+            if (!hasMorning && !hasAfternoon && !hasFull && !hasUpdates) {
                 contentSections.innerHTML = '<div class="experiment-content" style="text-align: center; padding: 2rem; font-family: \'Courier New\', monospace;">📼 *static noise* ...<br><br>This part of the tape is still blank.<br>No experiments recorded yet!<br><br>🎵 Try another track! 🎵</div>';
                 contentDisplay.classList.add('active');
                 return;
@@ -1317,6 +1361,22 @@
                 const afternoonContent = await loadExternalContent(hasAfternoon);
                 afternoonSection.querySelector('.time-content').innerHTML = afternoonContent;
 
+                // Add updates section if it exists
+                if (hasUpdates) {
+                    const updatesSection = document.createElement('div');
+                    updatesSection.className = 'time-section';
+                    updatesSection.innerHTML = `
+                        <details>
+                            <summary>Update 1.1</summary>
+                            <div class="time-content">Loading updates...</div>
+                        </details>
+                    `;
+                    contentSections.appendChild(updatesSection);
+
+                    const updatesContent = await loadExternalContent(hasUpdates);
+                    updatesSection.querySelector('.time-content').innerHTML = updatesContent;
+                }
+
             } else if (hasMorning) {
                 const section = document.createElement('div');
                 section.className = 'time-section';
@@ -1344,6 +1404,14 @@
 
                 const content = await loadExternalContent(hasAfternoon);
                 section.querySelector('.time-content').innerHTML = content;
+            } else if (hasFull) {
+                const section = document.createElement('div');
+                section.className = 'full-day-content';
+                section.innerHTML = 'Loading content...';
+                contentSections.appendChild(section);
+
+                const content = await loadExternalContent(hasFull);
+                section.innerHTML = content;
             }
         }
 
@@ -1428,6 +1496,7 @@
             }
         }
 
+        let isDragging = false;
         let mouseX = 0;
         let mouseY = 0;
         let prevMouseX = 0;
@@ -1464,25 +1533,47 @@
                 let finalOffsetY = waveY;
                 let scale = 1;
 
-                if (distance < 10) {
-                    const influence = (10 - distance) / 10;
-                    const smoothInfluence = influence * influence;
+                // Adjust influence radius based on dragging state
+                const influenceRadius = isDragging ? 20 : 10;
 
-                    const pointerX = smoothVelocityX * smoothInfluence * 0.4;
-                    const pointerY = smoothVelocityY * smoothInfluence * 0.4;
+                if (distance < influenceRadius) {
+                    const influence = (influenceRadius - distance) / influenceRadius;
+                    const smoothInfluence = influence * influence;
 
                     if (!dot.targetX) {
                         dot.targetX = 0;
                         dot.targetY = 0;
                     }
 
-                    dot.targetX += (pointerX * 10 - dot.targetX) * 0.2;
-                    dot.targetY += (pointerY * 10 - dot.targetY) * 0.2;
+                    if (isDragging) {
+                        // Stronger cloth-like pull when dragging
+                        const pullStrength = 3.5;
+                        const dragOffsetX = dx * smoothInfluence * pullStrength;
+                        const dragOffsetY = dy * smoothInfluence * pullStrength;
+
+                        dot.targetX += (dragOffsetX - dot.targetX) * 0.25;
+                        dot.targetY += (dragOffsetY - dot.targetY) * 0.25;
+                    } else {
+                        // Original velocity-based movement
+                        const pointerX = smoothVelocityX * smoothInfluence * 0.4;
+                        const pointerY = smoothVelocityY * smoothInfluence * 0.4;
+
+                        dot.targetX += (pointerX * 10 - dot.targetX) * 0.2;
+                        dot.targetY += (pointerY * 10 - dot.targetY) * 0.2;
+                    }
 
                     finalOffsetX = waveX + dot.targetX;
                     finalOffsetY = waveY + dot.targetY;
 
-                    scale = 1 + (1 - distance / 10) * 1.05;
+                    scale = 1 + (1 - distance / influenceRadius) * 1.05;
+
+                    // Increase opacity by 70% when dragging
+                    if (isDragging) {
+                        const opacityBoost = dot.baseOpacity * 1.7;
+                        dot.element.style.opacity = Math.min(1, opacityBoost);
+                    } else {
+                        dot.element.style.opacity = dot.baseOpacity;
+                    }
                 } else if (dot.targetX && (Math.abs(dot.targetX) > 0.1 || Math.abs(dot.targetY) > 0.1)) {
                     dot.targetX *= 0.9;
                     dot.targetY *= 0.9;
@@ -1498,6 +1589,8 @@
                     if (distance < 10) {
                         scale = 1 + (1 - distance / 10) * 1.05;
                     }
+                    // Reset opacity for dots outside influence radius
+                    dot.element.style.opacity = dot.baseOpacity;
                 }
 
                 dot.element.style.transform = `translate(${finalOffsetX}px, ${finalOffsetY}px) scale(${scale})`;
@@ -1526,6 +1619,7 @@
         });
 
         heroSection.addEventListener('mouseleave', () => {
+            isDragging = false;
             mouseVelocityX = 0;
             mouseVelocityY = 0;
             smoothVelocityX = 0;
@@ -1537,6 +1631,24 @@
                     dot.targetY = 0;
                 }
             });
+        });
+
+        heroSection.addEventListener('mousedown', () => {
+            isDragging = true;
+            heroSection.style.cursor = 'grabbing';
+        });
+
+        heroSection.addEventListener('mouseup', () => {
+            isDragging = false;
+            heroSection.style.cursor = 'default';
+        });
+
+        // Also handle mouseup on document in case user releases outside the hero section
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                heroSection.style.cursor = 'default';
+            }
         });
 
         // Back to top functionality
