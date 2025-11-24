@@ -13,6 +13,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            cursor: url('docs/Pixel cursor.svg'), auto;
+        }
+
+        button, a, .track-button, .tape-button {
+            cursor: url('docs/Pixel cursor.svg'), pointer;
         }
 
         body {
@@ -20,6 +25,7 @@
             font-family: 'Courier New', monospace;
             overflow-x: hidden;
             width: 100%;
+            cursor: url('docs/Pixel cursor.svg'), auto;
         }
 
         .hero-section {
@@ -31,7 +37,7 @@
             padding: 20px;
             position: relative;
             overflow: hidden;
-            cursor: grab;
+            cursor: url('docs/Pixel cursor.svg'), auto;
         }
 
         .content-box {
@@ -188,7 +194,7 @@
             background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
             border: 3px solid #bbb;
             border-radius: 10px;
-            padding: 20px;
+            padding: 16px 20px 62px 20px;
             margin-bottom: 25px;
             position: relative;
             box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -198,7 +204,7 @@
             background-color: rgba(255, 255, 255, 0.5);
             border: 1px solid rgba(187, 187, 187, 0.4);
             padding: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 62px;
             text-align: center;
             font-family: 'Press Start 2P', cursive;
             font-size: 0.7rem;
@@ -264,8 +270,8 @@
 
         .reel::after {
             content: '';
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             background-color: #555;
             border-radius: 50%;
             border: 2px solid #999;
@@ -282,41 +288,7 @@
         }
 
         .tape-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tape-button {
-            background-color: #fff;
-            border: 3px solid #bbb;
-            border-radius: 5px;
-            padding: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.1s ease;
-            box-shadow: 0 4px 0 #999;
-            text-transform: uppercase;
-            color: #333;
-        }
-
-        .tape-button:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #999;
-        }
-
-        .tape-button.selected {
-            background-color: #333;
-            border-color: #666;
-            color: #fff;
-            box-shadow: 0 4px 0 #000;
-        }
-
-        .tape-button.selected:active {
-            box-shadow: 0 1px 0 #000;
+            display: none;
         }
 
         .control-panel {
@@ -879,7 +851,7 @@
             }
 
             .cassette-deck {
-                padding: 15px;
+                padding: 16px 15px 48px 15px;
             }
 
             .cassette-label {
@@ -1048,7 +1020,7 @@
             }
 
             .cassette-deck {
-                padding: 12px;
+                padding: 12px 12px 20px 12px;
             }
 
             .cassette-label {
@@ -1176,11 +1148,6 @@
                     <div class="reel" id="leftReel"></div>
                     <div class="reel" id="rightReel"></div>
                 </div>
-
-                <div class="tape-selector">
-                    <button class="tape-button" data-week="week1">Tape 1<br>WEEK 1</button>
-                    <button class="tape-button" data-week="week2">Tape 2<br>WEEK 2</button>
-                </div>
             </div>
 
             <div class="control-panel">
@@ -1251,7 +1218,8 @@
                 thursday: {
                     morning: "docs/Thursday-morning- week 1.md",
                     afternoon: "docs/Thursday-afternoon-week 1.md",
-                    updates: "docs/Updates-23Nov.md"
+                    updates: "docs/Updates-23Nov.md",
+                    "update1.2": "docs/Updates-24Nov.md"
                 },
                 friday: {
                     full: "docs/Friday-week 1.md"
@@ -1269,14 +1237,13 @@
         const contentDisplay = document.getElementById('content-display');
         const contentTitle = document.getElementById('content-title');
         const contentSections = document.getElementById('content-sections');
-        const tapeButtons = document.querySelectorAll('.tape-button');
         const trackButtons = document.querySelectorAll('.track-button');
         const displayValue = document.getElementById('displayValue');
         const cassetteDisplay = document.getElementById('cassetteDisplay');
         const leftReel = document.getElementById('leftReel');
         const rightReel = document.getElementById('rightReel');
 
-        let selectedWeek = null;
+        let selectedWeek = 'week1'; // Always week 1
         let selectedDay = null;
 
         async function loadExternalContent(fileName) {
@@ -1297,9 +1264,9 @@
         }
 
         async function updateContent() {
-            if (!selectedWeek || !selectedDay) {
+            if (!selectedDay) {
                 contentDisplay.classList.remove('active');
-                displayValue.textContent = '--:--';
+                displayValue.textContent = '---';
                 cassetteDisplay.classList.remove('playing');
                 leftReel.classList.remove('spinning');
                 rightReel.classList.remove('spinning');
@@ -1312,12 +1279,10 @@
             rightReel.classList.add('spinning');
 
             const dayData = docsMapping[selectedWeek][selectedDay];
-            const weekNum = selectedWeek.replace('week', '');
-            const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-            const trackNum = dayNames.indexOf(selectedDay) + 1;
 
-            contentTitle.textContent = `Week ${weekNum} - ${capitalizeFirst(selectedDay)}`;
-            displayValue.textContent = `${weekNum}:0${trackNum}`;
+            // Display just the day name
+            contentTitle.textContent = capitalizeFirst(selectedDay);
+            displayValue.textContent = capitalizeFirst(selectedDay);
 
             contentSections.innerHTML = '';
 
@@ -1325,8 +1290,9 @@
             const hasAfternoon = dayData.afternoon;
             const hasFull = dayData.full;
             const hasUpdates = dayData.updates;
+            const hasUpdate12 = dayData["update1.2"];
 
-            if (!hasMorning && !hasAfternoon && !hasFull && !hasUpdates) {
+            if (!hasMorning && !hasAfternoon && !hasFull && !hasUpdates && !hasUpdate12) {
                 contentSections.innerHTML = '<div class="experiment-content" style="text-align: center; padding: 2rem; font-family: \'Courier New\', monospace;">📼 *static noise* ...<br><br>This part of the tape is still blank.<br>No experiments recorded yet!<br><br>🎵 Try another track! 🎵</div>';
                 contentDisplay.classList.add('active');
                 return;
@@ -1377,6 +1343,22 @@
                     updatesSection.querySelector('.time-content').innerHTML = updatesContent;
                 }
 
+                // Add update 1.2 section if it exists
+                if (hasUpdate12) {
+                    const update12Section = document.createElement('div');
+                    update12Section.className = 'time-section';
+                    update12Section.innerHTML = `
+                        <details>
+                            <summary>Update 1.2</summary>
+                            <div class="time-content">Loading updates...</div>
+                        </details>
+                    `;
+                    contentSections.appendChild(update12Section);
+
+                    const update12Content = await loadExternalContent(hasUpdate12);
+                    update12Section.querySelector('.time-content').innerHTML = update12Content;
+                }
+
             } else if (hasMorning) {
                 const section = document.createElement('div');
                 section.className = 'time-section';
@@ -1414,23 +1396,6 @@
                 section.innerHTML = content;
             }
         }
-
-        // Tape button handlers
-        tapeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                // Toggle selection - if already selected, deselect it
-                if (button.classList.contains('selected')) {
-                    button.classList.remove('selected');
-                    selectedWeek = null;
-                } else {
-                    tapeButtons.forEach(btn => btn.classList.remove('selected'));
-                    button.classList.add('selected');
-                    selectedWeek = button.dataset.week;
-                }
-
-                updateContent();
-            });
-        });
 
         // Track button handlers
         trackButtons.forEach(button => {

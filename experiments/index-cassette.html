@@ -208,41 +208,7 @@
         }
 
         .tape-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tape-button {
-            background-color: #fff;
-            border: 3px solid #bbb;
-            border-radius: 5px;
-            padding: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.1s ease;
-            box-shadow: 0 4px 0 #999;
-            text-transform: uppercase;
-            color: #333;
-        }
-
-        .tape-button:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #999;
-        }
-
-        .tape-button.selected {
-            background-color: #333;
-            border-color: #666;
-            color: #fff;
-            box-shadow: 0 4px 0 #000;
-        }
-
-        .tape-button.selected:active {
-            box-shadow: 0 1px 0 #000;
+            display: none;
         }
 
         .control-panel {
@@ -737,31 +703,26 @@
                     <div class="reel" id="leftReel"></div>
                     <div class="reel" id="rightReel"></div>
                 </div>
-
-                <div class="tape-selector">
-                    <button class="tape-button" data-week="week1">Tape 1<br>WEEK 1</button>
-                    <button class="tape-button" data-week="week2">Tape 2<br>WEEK 2</button>
-                </div>
             </div>
 
             <div class="control-panel">
-                <button class="track-button disabled" data-day="monday">
+                <button class="track-button" data-day="monday">
                     <span class="track-number">1</span>
                     <span>MON</span>
                 </button>
-                <button class="track-button disabled" data-day="tuesday">
+                <button class="track-button" data-day="tuesday">
                     <span class="track-number">2</span>
                     <span>TUE</span>
                 </button>
-                <button class="track-button disabled" data-day="wednesday">
+                <button class="track-button" data-day="wednesday">
                     <span class="track-number">3</span>
                     <span>WED</span>
                 </button>
-                <button class="track-button disabled" data-day="thursday">
+                <button class="track-button" data-day="thursday">
                     <span class="track-number">4</span>
                     <span>THU</span>
                 </button>
-                <button class="track-button disabled" data-day="friday">
+                <button class="track-button" data-day="friday">
                     <span class="track-number">5</span>
                     <span>FRI</span>
                 </button>
@@ -824,13 +785,12 @@
         const contentDisplay = document.getElementById('content-display');
         const contentTitle = document.getElementById('content-title');
         const contentSections = document.getElementById('content-sections');
-        const tapeButtons = document.querySelectorAll('.tape-button');
         const trackButtons = document.querySelectorAll('.track-button');
         const displayValue = document.getElementById('displayValue');
         const leftReel = document.getElementById('leftReel');
         const rightReel = document.getElementById('rightReel');
 
-        let selectedWeek = null;
+        let selectedWeek = 'week1'; // Always week 1
         let selectedDay = null;
 
         async function loadExternalContent(fileName) {
@@ -851,9 +811,9 @@
         }
 
         async function updateContent() {
-            if (!selectedWeek || !selectedDay) {
+            if (!selectedDay) {
                 contentDisplay.classList.remove('active');
-                displayValue.textContent = '--:--';
+                displayValue.textContent = '---';
                 leftReel.classList.remove('spinning');
                 rightReel.classList.remove('spinning');
                 return;
@@ -864,12 +824,10 @@
             rightReel.classList.add('spinning');
 
             const dayData = docsMapping[selectedWeek][selectedDay];
-            const weekNum = selectedWeek.replace('week', '');
-            const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-            const trackNum = dayNames.indexOf(selectedDay) + 1;
 
-            contentTitle.textContent = `Week ${weekNum} - ${capitalizeFirst(selectedDay)}`;
-            displayValue.textContent = `${weekNum}:0${trackNum}`;
+            // Display just the day name
+            contentTitle.textContent = `Week 1 - ${capitalizeFirst(selectedDay)}`;
+            displayValue.textContent = capitalizeFirst(selectedDay);
 
             contentSections.innerHTML = '';
 
@@ -941,35 +899,9 @@
             }
         }
 
-        // Tape button handlers
-        tapeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tapeButtons.forEach(btn => btn.classList.remove('selected'));
-                button.classList.add('selected');
-                selectedWeek = button.dataset.week;
-
-                // Enable track buttons based on content availability
-                trackButtons.forEach(trackBtn => {
-                    const day = trackBtn.dataset.day;
-                    const hasContent = docsMapping[selectedWeek][day].morning ||
-                                     docsMapping[selectedWeek][day].afternoon;
-
-                    if (hasContent) {
-                        trackBtn.classList.remove('disabled');
-                    } else {
-                        trackBtn.classList.add('disabled');
-                    }
-                });
-
-                updateContent();
-            });
-        });
-
         // Track button handlers
         trackButtons.forEach(button => {
             button.addEventListener('click', () => {
-                if (button.classList.contains('disabled')) return;
-
                 trackButtons.forEach(btn => btn.classList.remove('selected'));
                 button.classList.add('selected');
                 selectedDay = button.dataset.day;
