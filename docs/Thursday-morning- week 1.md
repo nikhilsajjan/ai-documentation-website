@@ -36,7 +36,7 @@ An interactive website for showcasing AI experiments from the CIID Interaction D
 **User Request:** Update description to introduce Nikhil from CIID Interaction Design Program
 
 **Final Description:**
-"Hi, I'm Nikhil, currently enrolled in the Interaction Design Program at CIID. This website showcases my AI experimentations from this week's course: AI Experiments. Week 1 faculty: Durrel Bishop and Jonathan Topf."
+"Hi, I'm Nikhil, currently enrolled in the Interaction Design Program at CIID. This website showcases my AI experimentations from this week's course: AI Experiments. Week 1 faculties."
 
 ---
 

@@ -89,6 +89,70 @@
             font-weight: 500;
         }
 
+        .about-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            background-color: #fff;
+        }
+
+        .about-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .about-content {
+            flex: 1;
+        }
+
+        .about-content h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-description {
+            font-family: 'Courier New', monospace;
+            font-size: 1.25rem;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .about-image {
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .about-image img {
+            width: 200px;
+            height: auto;
+            border: 3px solid #333;
+            border-radius: 8px;
+        }
+
+        .about-image .dark-mode-img {
+            display: none;
+        }
+
+        .about-image .light-mode-img {
+            display: block;
+        }
+
+        .image-caption {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
         .experiments-section {
             min-height: 100vh;
             display: flex;
@@ -96,7 +160,7 @@
             justify-content: center;
             align-items: center;
             padding: 60px 20px;
-            background-color: #fff;
+            background-color: #f5f5f5;
         }
 
         h2 {
@@ -600,6 +664,34 @@
             color: #d0d0d0;
         }
 
+        body.dark-mode .about-section {
+            background-color: #1f1f1f;
+        }
+
+        body.dark-mode .about-content h2 {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .about-description {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .about-image img {
+            border-color: #555;
+        }
+
+        body.dark-mode .about-image .dark-mode-img {
+            display: block;
+        }
+
+        body.dark-mode .about-image .light-mode-img {
+            display: none;
+        }
+
+        body.dark-mode .image-caption {
+            color: #888;
+        }
+
         body.dark-mode .experiments-section {
             background-color: #252525;
         }
@@ -939,6 +1031,11 @@
                 font-size: 0.9rem;
             }
 
+            .hero-section {
+                min-height: 100vw;
+                max-height: 100vh;
+            }
+
             .content-display {
                 padding: 20px;
             }
@@ -948,21 +1045,23 @@
             }
 
             .footer-content {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto 3px auto auto;
+                display: flex;
+                flex-direction: column;
                 padding: 0;
             }
 
             .footer-divider {
                 height: 3px;
                 width: 100%;
+                order: 2;
             }
 
             .footer-name {
                 order: 1;
-                padding: 30px 20px 20px;
+                padding: 30px 20px;
                 flex-direction: column;
-                gap: 15px;
+                gap: 20px;
+                text-align: center;
             }
 
             .footer-name h3 {
@@ -970,26 +1069,24 @@
                 line-height: 1.5;
             }
 
-            .footer-divider {
-                order: 2;
-            }
-
             .footer-links {
                 order: 3;
                 padding: 30px 20px;
+                text-align: center;
+                align-items: center;
             }
 
             .footer-back-to-top {
                 position: static;
-                padding: 20px 0 0;
+                padding: 25px 0 0;
                 display: flex;
                 justify-content: center;
-                margin-top: 10px;
+                margin-top: 15px;
             }
 
             .dark-mode-toggle {
                 position: static;
-                margin: 0;
+                margin: 10px auto 0;
                 width: auto;
             }
 
@@ -999,6 +1096,26 @@
 
             .content-box {
                 padding: 30px 40px;
+            }
+
+            .about-section {
+                padding: 50px 20px;
+            }
+
+            .about-container {
+                gap: 30px;
+            }
+
+            .about-content h2 {
+                font-size: 1.2rem;
+            }
+
+            .about-description {
+                font-size: 1.1rem;
+            }
+
+            .about-image img {
+                width: 150px;
             }
         }
 
@@ -1070,6 +1187,11 @@
                 font-size: 0.85rem;
             }
 
+            .hero-section {
+                min-height: 100vw;
+                max-height: 100vh;
+            }
+
             .content-box {
                 padding: 20px 25px;
             }
@@ -1078,43 +1200,71 @@
                 padding: 15px;
             }
 
+            .about-section {
+                padding: 40px 15px;
+            }
+
+            .about-container {
+                gap: 25px;
+            }
+
+            .about-content h2 {
+                font-size: 1rem;
+            }
+
+            .about-description {
+                font-size: 1rem;
+            }
+
+            .about-image img {
+                width: 120px;
+            }
+
+            .image-caption {
+                font-size: 0.7rem;
+            }
+
             .footer-content {
                 padding: 0;
             }
 
             .footer-name {
-                padding: 25px 15px 15px;
-                gap: 12px;
+                padding: 25px 15px;
+                gap: 15px;
             }
 
             .footer-name h3 {
-                font-size: 1.1rem;
+                font-size: 1rem;
                 line-height: 1.4;
             }
 
             .footer-links {
                 padding: 25px 15px;
-                gap: 12px;
+                gap: 10px;
             }
 
             .footer-links h4 {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
                 margin-bottom: 8px;
             }
 
             .footer-links a {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
 
             .footer-back-to-top {
-                padding: 15px 0 0;
-                margin-top: 8px;
+                padding: 20px 0 0;
+                margin-top: 10px;
             }
 
             .back-to-top-btn,
             .dark-mode-toggle {
-                padding: 10px 16px;
-                font-size: 0.8rem;
+                padding: 8px 14px;
+                font-size: 0.7rem;
+            }
+
+            .dark-mode-toggle {
+                margin: 5px auto 0;
             }
         }
     </style>
@@ -1123,7 +1273,21 @@
     <section class="hero-section">
         <div class="content-box">
             <h1>AI experimentations</h1>
-            <p class="description">Hi, I'm Nikhil, currently enrolled in the Interaction Design Program at CIID. This website showcases my AI experimentations from this week's course: AI Experiments. Week 1 faculty: Durrel Bishop and Jonathan Topf.</p>
+            <p class="description">Hi, I'm Nikhil, currently enrolled in the Interaction Design Program at CIID. This website showcases my AI experimentations from this week's course.</p>
+        </div>
+    </section>
+
+    <section class="about-section">
+        <div class="about-container">
+            <div class="about-content">
+                <h2>About</h2>
+                <p class="about-description">AI Experements as the name suggests the week was all about getting my hands dirty and getting used with AI to make fun little projects where I was creating a wide range of projects in very little time to quickly prototype them by just chatting with Claude Code this helped me to turn ideas into quick prototypes which would take at least a week to get at. This week helped me understand how can I turn an idea into a quick prototype in few hours to check and validate ideas. Since the course I have been using AI as a desk buddy to get things done who is also an expert in few subject matters.</p>
+            </div>
+            <div class="about-image">
+                <img src="docs/claude code light.jpg" alt="Claude Code - AI coding assistant" class="light-mode-img">
+                <img src="docs/claude code dark.webp" alt="Claude Code - AI coding assistant" class="dark-mode-img">
+                <p class="image-caption">Built with Claude Code</p>
+            </div>
         </div>
     </section>
 
@@ -1191,9 +1355,9 @@
 
             <div class="footer-links">
                 <h4>Connect</h4>
-                <a href="https://your-website.com" target="_blank">Personal Website</a>
-                <a href="https://linkedin.com/in/your-profile" target="_blank">LinkedIn</a>
-                <a href="https://instagram.com/your-profile" target="_blank">Instagram</a>
+                <a href="https://nikhilsajjan.framer.website" target="_blank">Personal Website</a>
+                <a href="https://www.linkedin.com/in/nikhilbsajjan/" target="_blank">LinkedIn</a>
+                <a href="https://www.instagram.com/finding_frame/" target="_blank">Instagram</a>
 
                 <div class="footer-back-to-top">
                     <a href="#" class="back-to-top-btn" id="backToTop">
@@ -1219,10 +1383,13 @@
                     morning: "docs/Thursday-morning- week 1.md",
                     afternoon: "docs/Thursday-afternoon-week 1.md",
                     updates: "docs/Updates-23Nov.md",
-                    "update1.2": "docs/Updates-24Nov.md"
+                    "update1.2": "docs/Updates-24Nov.md",
+                    "update1.3": "docs/Thursday-update 8Dec.txt",
+                    "update1.4": "docs/history dec 15th .txt"
                 },
                 friday: {
-                    full: "docs/Friday-week 1.md"
+                    "version0": "docs/Friday-week 1.md",
+                    "update1.0": "docs/canon_History_1Dec.txt"
                 }
             },
             week2: {
@@ -1291,8 +1458,12 @@
             const hasFull = dayData.full;
             const hasUpdates = dayData.updates;
             const hasUpdate12 = dayData["update1.2"];
+            const hasUpdate13 = dayData["update1.3"];
+            const hasUpdate14 = dayData["update1.4"];
+            const hasVersion0 = dayData["version0"];
+            const hasUpdate10 = dayData["update1.0"];
 
-            if (!hasMorning && !hasAfternoon && !hasFull && !hasUpdates && !hasUpdate12) {
+            if (!hasMorning && !hasAfternoon && !hasFull && !hasUpdates && !hasUpdate12 && !hasUpdate13 && !hasUpdate14 && !hasVersion0 && !hasUpdate10) {
                 contentSections.innerHTML = '<div class="experiment-content" style="text-align: center; padding: 2rem; font-family: \'Courier New\', monospace;">📼 *static noise* ...<br><br>This part of the tape is still blank.<br>No experiments recorded yet!<br><br>🎵 Try another track! 🎵</div>';
                 contentDisplay.classList.add('active');
                 return;
@@ -1359,6 +1530,38 @@
                     update12Section.querySelector('.time-content').innerHTML = update12Content;
                 }
 
+                // Add update 1.3 section if it exists
+                if (hasUpdate13) {
+                    const update13Section = document.createElement('div');
+                    update13Section.className = 'time-section';
+                    update13Section.innerHTML = `
+                        <details>
+                            <summary>Update 1.3</summary>
+                            <div class="time-content">Loading updates...</div>
+                        </details>
+                    `;
+                    contentSections.appendChild(update13Section);
+
+                    const update13Content = await loadExternalContent(hasUpdate13);
+                    update13Section.querySelector('.time-content').innerHTML = update13Content;
+                }
+
+                // Add update 1.4 section if it exists
+                if (hasUpdate14) {
+                    const update14Section = document.createElement('div');
+                    update14Section.className = 'time-section';
+                    update14Section.innerHTML = `
+                        <details>
+                            <summary>Update 1.4</summary>
+                            <div class="time-content">Loading updates...</div>
+                        </details>
+                    `;
+                    contentSections.appendChild(update14Section);
+
+                    const update14Content = await loadExternalContent(hasUpdate14);
+                    update14Section.querySelector('.time-content').innerHTML = update14Content;
+                }
+
             } else if (hasMorning) {
                 const section = document.createElement('div');
                 section.className = 'time-section';
@@ -1394,6 +1597,36 @@
 
                 const content = await loadExternalContent(hasFull);
                 section.innerHTML = content;
+            } else if (hasVersion0) {
+                // Version-based sections (like Friday)
+                const version0Section = document.createElement('div');
+                version0Section.className = 'time-section';
+                version0Section.innerHTML = `
+                    <details open>
+                        <summary>Version 0</summary>
+                        <div class="time-content">Loading content...</div>
+                    </details>
+                `;
+                contentSections.appendChild(version0Section);
+
+                const version0Content = await loadExternalContent(hasVersion0);
+                version0Section.querySelector('.time-content').innerHTML = version0Content;
+
+                // Add Update 1.0 section if it exists
+                if (hasUpdate10) {
+                    const update10Section = document.createElement('div');
+                    update10Section.className = 'time-section';
+                    update10Section.innerHTML = `
+                        <details>
+                            <summary>Update 1.0</summary>
+                            <div class="time-content">Loading updates...</div>
+                        </details>
+                    `;
+                    contentSections.appendChild(update10Section);
+
+                    const update10Content = await loadExternalContent(hasUpdate10);
+                    update10Section.querySelector('.time-content').innerHTML = update10Content;
+                }
             }
         }
 
@@ -1499,7 +1732,7 @@
                 let scale = 1;
 
                 // Adjust influence radius based on dragging state
-                const influenceRadius = isDragging ? 20 : 10;
+                const influenceRadius = isDragging ? 10 : 10;
 
                 if (distance < influenceRadius) {
                     const influence = (influenceRadius - distance) / influenceRadius;
@@ -1614,6 +1847,58 @@
                 isDragging = false;
                 heroSection.style.cursor = 'default';
             }
+        });
+
+        // Touch event support for mobile
+        heroSection.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            const touch = e.touches[0];
+            const rect = heroSection.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            mouseX = (x / rect.width) * 100;
+            mouseY = (y / rect.height) * 100;
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+        }, { passive: true });
+
+        heroSection.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+
+            const touch = e.touches[0];
+            const rect = heroSection.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+            mouseX = (x / rect.width) * 100;
+            mouseY = (y / rect.height) * 100;
+
+            mouseVelocityX = mouseX - prevMouseX;
+            mouseVelocityY = mouseY - prevMouseY;
+        }, { passive: true });
+
+        heroSection.addEventListener('touchend', () => {
+            isDragging = false;
+            mouseVelocityX = 0;
+            mouseVelocityY = 0;
+            smoothVelocityX = 0;
+            smoothVelocityY = 0;
+
+            dots.forEach(dot => {
+                if (dot.targetX) {
+                    dot.targetX = 0;
+                    dot.targetY = 0;
+                }
+            });
+        });
+
+        heroSection.addEventListener('touchcancel', () => {
+            isDragging = false;
+            mouseVelocityX = 0;
+            mouseVelocityY = 0;
         });
 
         // Back to top functionality
